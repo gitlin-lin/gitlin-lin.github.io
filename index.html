@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《星轨》- 人物关系与事件时间轴</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .timeline-dot {
+                @apply w-4 h-4 rounded-full z-10 border-4;
+            }
+            .timeline-line {
+                @apply absolute left-2 top-4 bottom-0 w-0.5 z-0;
+            }
+            .node-hover {
+                @apply transition-all duration-300 hover:scale-110 hover:shadow-lg;
+            }
+            .edge-label {
+                @apply text-xs bg-white/90 px-1.5 py-0.5 rounded border border-gray-200;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800">
+  <!-- 导航栏 -->
+  <nav class="bg-white shadow-md fixed w-full top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-xl font-bold text-pink-600 flex items-center">
+        <i class="fa fa-star mr-2 text-yellow-400"></i>《星轨》可视化
+      </h1>
+      <div class="flex space-x-6">
+        <a href="#character-network" class="hover:text-pink-600 transition-colors flex items-center">
+          <i class="fa fa-sitemap mr-1"></i>人物关系
+        </a>
+        <a href="#timeline" class="hover:text-pink-600 transition-colors flex items-center">
+          <i class="fa fa-clock-o mr-1"></i>事件时间轴
+        </a>
+        <a href="#key-characters" class="hover:text-pink-600 transition-colors flex items-center">
+          <i class="fa fa-user-circle mr-1"></i>核心人物
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 头部横幅 -->
+  <header class="pt-24 pb-16 bg-gradient-to-r from-pink-50 to-blue-50">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-800">孙一杨 & 邓开文</h2>
+      <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+        从初中到大学，跨越八年的情感羁绊：暗恋、暧昧、相恋、分手、复合，在时光流转中，两人相互塑造、彼此成就，最终成为彼此生命中不可替代的存在
+      </p>
+      <div class="mt-8 flex justify-center space-x-4">
+        <span class="px-4 py-2 bg-pink-100 text-pink-700 rounded-full text-sm flex items-center">
+          <i class="fa fa-heart mr-1"></i>核心情侣
+        </span>
+        <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm flex items-center">
+          <i class="fa fa-calendar mr-1"></i>2017-2025
+        </span>
+        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm flex items-center">
+          <i class="fa fa-book mr-1"></i>校园情感
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 核心人物介绍 -->
+  <section id="key-characters" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <h3 class="text-2xl font-bold mb-10 text-center border-b pb-3 inline-block mx-auto">核心人物档案</h3>
+
+      <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <!-- 孙一杨 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 node-hover">
+          <div class="bg-pink-600 text-white p-4">
+            <h4 class="text-xl font-bold flex items-center">
+              <i class="fa fa-user-circle mr-2"></i>孙一杨（女主）
+            </h4>
+          </div>
+          <div class="p-6">
+            <div class="flex items-start mb-4">
+              <i class="fa fa-id-card-o text-pink-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">基本信息</h5>
+                <p class="text-gray-600 text-sm">南宁十四中→南宁二中→北京大学，文科学霸，性格执着、情感外放，从初中暗恋邓开文，始终保持自我成长，最终与邓开文复合。</p>
+              </div>
+            </div>
+            <div class="flex items-start mb-4">
+              <i class="fa fa-heart-o text-pink-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">情感特质</h5>
+                <p class="text-gray-600 text-sm">重感情、专一，面对情感矛盾会主动沟通，虽经历分手低谷，但始终无法忘记邓开文，最终选择遵从内心复合。</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <i class="fa fa-star-o text-pink-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">关键成长</h5>
+                <p class="text-gray-600 text-sm">从初中“以邓开文为目标”的追赶者，成长为独立的北大优等生，明确自身情感需求，学会平衡学业与爱情。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 邓开文 -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 node-hover">
+          <div class="bg-blue-600 text-white p-4">
+            <h4 class="text-xl font-bold flex items-center">
+              <i class="fa fa-user-circle mr-2"></i>邓开文（男主）
+            </h4>
+          </div>
+          <div class="p-6">
+            <div class="flex items-start mb-4">
+              <i class="fa fa-id-card-o text-blue-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">基本信息</h5>
+                <p class="text-gray-600 text-sm">南宁十四中→南宁二中→复旦大学，理科学霸（物竞方向），学生会副主席，性格执着但情感边界模糊，经历成长后学会珍惜孙一杨。</p>
+              </div>
+            </div>
+            <div class="flex items-start mb-4">
+              <i class="fa fa-heart-o text-blue-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">情感特质</h5>
+                <p class="text-gray-600 text-sm">内敛、被动，初期不懂情感边界（如与罗美桃过度互动），经历分手反思后，学会主动表达爱意，明确孙一杨的独特性。</p>
+              </div>
+            </div>
+            <div class="flex items-start">
+              <i class="fa fa-star-o text-blue-600 mt-1 mr-3"></i>
+              <div>
+                <h5 class="font-semibold mb-1">关键成长</h5>
+                <p class="text-gray-600 text-sm">从高中“学业优先、忽略情感需求”的直男，成长为懂得平衡学业与爱情的复旦学子，主动挽回孙一杨，承诺共同面对未来。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 次要人物概览 -->
+      <div class="mt-12 max-w-5xl mx-auto">
+        <h4 class="text-xl font-bold mb-6 text-center">次要人物关系矩阵</h4>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse bg-white shadow-md rounded-lg">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border border-gray-200 px-4 py-3 text-left">人物</th>
+                <th class="border border-gray-200 px-4 py-3 text-left">与核心人物关系</th>
+                <th class="border border-gray-200 px-4 py-3 text-left">关键互动事件</th>
+                <th class="border border-gray-200 px-4 py-3 text-left">关系影响</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">彭海宁</td>
+                <td class="border border-gray-200 px-4 py-3">邓开文初中女友</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">与邓开文恋爱期间，邓开文与孙一杨产生暧昧；分手后仍收邓开文红包</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">激发孙一杨“竞争意识”，成为孙一杨初期情感顾虑来源</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">罗美桃</td>
+                <td class="border border-gray-200 px-4 py-3">邓开文高中同学</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">频繁与邓开文肢体接触（搭肩、拍肚皮），邓开文未明确拒绝</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">引发孙一杨强烈不满，成为高中时期核心情感矛盾点</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">李奕</td>
+                <td class="border border-gray-200 px-4 py-3">孙一杨大学前男友</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">与孙一杨交往期间，无法接受孙一杨与邓开文保持联系</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">让孙一杨明确“无法忘记邓开文”，为后续复合埋下伏笔</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">林楚珊</td>
+                <td class="border border-gray-200 px-4 py-3">孙一杨闺蜜</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">见证两人情感历程，调解矛盾，为复合拍摄纪念照片</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">孙一杨情感支撑，客观分析两人关系，推动复合</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">邓健桓</td>
+                <td class="border border-gray-200 px-4 py-3">邓开文好友</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">客观分析邓开文性格，支持两人复合，参与共同聚会</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">邓开文情感旁观者，帮助邓开文认清对孙一杨的感情</td>
+              </tr>
+              <tr class="hover:bg-gray-50">
+                <td class="border border-gray-200 px-4 py-3 font-medium">郭雄</td>
+                <td class="border border-gray-200 px-4 py-3">邓开文高中班主任</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">因担心影响学习反对两人恋爱，要求邓开文与孙一杨断联</td>
+                <td class="border border-gray-200 px-4 py-3 text-sm">高中时期外部阻力，加剧两人情感矛盾，但也考验感情韧性</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 人物关系网络可视化 -->
+  <section id="character-network" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <h3 class="text-2xl font-bold mb-10 text-center border-b pb-3 inline-block mx-auto">人物关系网络</h3>
+
+      <div class="max-w-6xl mx-auto bg-white p-4 rounded-xl shadow-md">
+        <!-- D3.js 人物关系图容器 -->
+        <div id="network-graph" class="w-full h-[600px]"></div>
+
+        <!-- 图例 -->
+        <div class="flex flex-wrap justify-center mt-6 gap-6">
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full bg-pink-600 mr-2"></div>
+            <span>孙一杨（女主）</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full bg-blue-600 mr-2"></div>
+            <span>邓开文（男主）</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full bg-yellow-500 mr-2"></div>
+            <span>邓开文前任/暧昧对象</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+            <span>核心支持型好友</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-4 h-4 rounded-full bg-purple-500 mr-2"></div>
+            <span>老师/外部影响者</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-1 h-1 bg-gray-400 mr-2"></div>
+            <span>关系连线（越粗关联越紧密）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 男女主事件时间轴 -->
+  <section id="timeline" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <h3 class="text-2xl font-bold mb-10 text-center border-b pb-3 inline-block mx-auto">孙一杨 & 邓开文 事件时间轴（2017-2025）
+      </h3>
+
+      <div class="max-w-4xl mx-auto relative">
+        <!-- 时间轴主线 -->
+        <div class="timeline-line bg-gray-300"></div>
+
+        <!-- 2017年 暗恋萌芽（孙一杨初一，邓开文初二） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-pink-300 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-pink-300">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-pink-300">2017年 暗恋萌芽（孙一杨初一，邓开文初二）</h4>
+              <span class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded">情感启蒙期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>孙一杨通过小学学姐第一次听闻邓开文，学姐玩笑式称呼其“男朋友”，孙一杨懵懂心动但未见面</li>
+              <li>邓开文作为学生会副主席检查卫生，孙一杨因班级扣分紧张，邓开文主动安慰“下次注意即可”，留下温柔印象</li>
+              <li>孙一杨开始刻意关注邓开文：收集其主持活动的照片、打听其学习成绩（年级前列）、模仿其作息（早起跑步）</li>
+              <li>两人首次正式对话：孙一杨忘带学生证，邓开文帮忙登记放行，提醒“下次别马虎”，成为暗恋的关键触发点</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2017年：初识与暗恋 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-pink-600 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-pink-600">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-pink-600">2017年 初中初识（孙一杨初一，邓开文初二）</h4>
+              <span class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded">暗恋萌芽期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>孙一杨通过小学学姐初识邓开文，对“男朋友”称呼感到懵懂，未看清邓开文样貌</li>
+              <li>邓开文以学生会副主席身份邀请孙一杨参加二中成人礼，孙一杨因补作业拒绝</li>
+              <li>诗文朗诵比赛两人同为主持人，邓开文提醒孙一杨“话筒会收音”，展现专业素养，孙一杨心生好感</li>
+              <li>两人约定每天下午跑步，孙一杨频繁去邓开文教室等他，面对同学起哄假装否认喜欢</li>
+            </ul>
+          </div>
+        </div>
+
+
+        <!-- 2018年：暧昧升温 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-pink-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-pink-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-pink-500">2018年 暧昧升温（孙一杨初二，邓开文初三）</h4>
+              <span class="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded">暧昧互动期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>邓开文帮孙一杨准备辩论赛，边跑步边讲辩论思路，两人关系进一步拉近</li>
+              <li>孙一杨发现邓开文与彭海宁恋爱，心生“竞争”心态，冲刺年级第一（初一下段考首获年一）</li>
+              <li>邓开文送孙一杨六一/元旦礼物（《火印》《量子力学外传》），孙一杨回赠笔记本（撕去扉页名字）</li>
+              <li>邓开文中考前，孙一杨陪他走回班级收拾东西，内心萌生“想抱抱他”的念头但未说出口</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 2019年：高中初识与边界模糊 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-blue-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-blue-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-blue-500">2019年 高中初识（孙一杨初三，邓开文高一）</h4>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">边界模糊期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>邓开文回十四中看老师，给孙一杨送二中明信片，鼓励她考上二中</li>
+              <li>2019.12.31 邓开文邀请孙一杨去二中启天晚会，陪她一整晚，两人在人流中牵手（后松开）</li>
+              <li>邓开文告知孙一杨“已与彭海宁分手”，提及喜欢隔壁班nzw，但仍与彭海宁保持联系</li>
+              <li>孙一杨中考前，邓开文帮她拍送考照片，孙一杨提出“抱一下”被没听清，后不了了之</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2019年：脚踏两条船（邓开文高一，孙一杨初三） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-orange-600 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-orange-600">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-orange-600">2019年 脚踏两条船（邓开文高一，孙一杨初三）</h4>
+              <span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">多线暧昧期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>邓开文高一初期告知孙一杨“已与彭海宁分手”，同时提及喜欢隔壁班nzw（初中南宁市第一）</li>
+              <li>疫情期间，邓开文通过QQ、微信、钉钉疯狂联系孙一杨，打视频电话唱《你钉起来真好听》，释放明确暧昧信号</li>
+              <li>孙一杨发现邓开文仍与彭海宁互动：彭海宁发说说晒邓开文200元春节红包（配文“谢谢邓总”）</li>
+              <li>孙一杨质问后，邓开文直言“nzw不回消息，phn不香吗”，暴露同时与两人保持联系的脚踏两条船行为</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2020年：确认关系 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-red-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-red-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-red-500">2020年 确认关系（孙一杨高一，邓开文高二）</h4>
+              <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">正式恋爱期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>2020.7 孙一杨参加二中启天营，邓开文摸她头，孙一杨追问后邓开文承认“喜欢她”，两人确认关系</li>
+              <li>邓开文带孙一杨去通用技术教室学激光打印，在教室亲吻，关系升温</li>
+              <li>郭雄发现两人关系，要求分手断联，孙一杨找郭雄谈判未果，两人转入“地下恋爱”</li>
+              <li>邓开文生日，孙一杨去他家，两人第一次在家中亲吻，确认彼此心意</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2020年 地下恋爱（孙一杨高一，邓开文高二） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-purple-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-purple-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-purple-500">2020年 地下恋爱（孙一杨高一，邓开文高二）</h4>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">阻力考验期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>两人确认关系后，郭雄（邓开文班主任）发现恋爱迹象，约谈邓开文要求“以学业为重，立刻分手”</li>
+              <li>孙一杨主动找郭雄谈判，强调“不会影响学习”，但郭雄坚持反对，两人被迫转入“地下恋爱”</li>
+              <li>秘密互动细节：课间在教学楼天台短暂见面、用加密QQ表情沟通、邓开文帮孙一杨补习物理（孙一杨弱项）</li>
+              <li>孙一杨父母察觉恋爱，未明确反对但要求“高三前必须断联”，两人约定“偷偷坚持，用成绩证明”</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2021年 恋爱中边界缺失（孙一杨高二，邓开文高三） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-red-600 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-red-600">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-red-600">2021年 恋爱中边界缺失（孙一杨高二，邓开文高三）</h4>
+              <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">脚踏两条船争议期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>邓开文与孙一杨确认恋爱关系后，罗美桃频繁与其产生肢体接触：从背后拍肩、搭肩走路、拍邓开文肚皮</li>
+              <li>孙一杨多次目睹两人亲密互动（含孙一杨在场时罗美桃拉邓开文手腕），要求邓开文明确拒绝，邓开文不以为然</li>
+              <li>潘笑航告知孙一杨“邓开文与罗美桃经常单独约自习、讲题”，引发孙一杨强烈安全感缺失</li>
+              <li>最终孙一杨要求三方当面沟通，明确要求罗美桃保持距离，邓开文才正视边界问题，减少与罗美桃单独互动</li>
+              <li>此事件成为两人高中时期最严重的情感矛盾，被孙一杨记录为“邓开文恋爱中脚踏两条船的争议行为”</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2022年：分手与异地 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-gray-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-gray-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-gray-500">2022年 分手与异地（孙一杨高三，邓开文大一）</h4>
+              <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">分手空窗期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>2022.6 邓开文高考结束，因“回复消息敷衍”“未来规划模糊”，孙一杨提出分手</li>
+              <li>孙一杨高三备考，邓开文在上海读复旦，两人偶尔联系但未复合</li>
+              <li>2022.10 邓开文来北京看孙一杨，两人在北大未名湖拍照，但仍未复合</li>
+              <li>孙一杨高考结束，考获广西文科状元，填报北京大学，与邓开文正式进入异地状态</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2022年 异地拉扯（孙一杨高三，邓开文大一） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-blue-400 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-blue-400">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-blue-400">2022年 异地拉扯（孙一杨高三，邓开文大一）</h4>
+              <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">情感未断期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>分手后邓开文赴上海读复旦，孙一杨留在南宁备战高考，两人虽无恋爱关系，但保持低频联系（每月1-2次微信）</li>
+              <li>邓开文分享复旦校园生活、物竞学习日常，孙一杨倾诉高三压力，仍以“朋友”身份关心彼此</li>
+              <li>2022.10 邓开文借国庆假期来北京参加竞赛，顺道去北大探望孙一杨（提前保送），两人在未名湖散步3小时，未提复合</li>
+              <li>孙一杨高考前一晚，邓开文发长文鼓励“相信你的实力，无论结果如何，我都为你骄傲”，成为重要精神支撑</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2023年 新欢对比（孙一杨大一，邓开文大二） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-green-400 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-green-400">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-green-400">2023年 新欢对比（孙一杨大一，邓开文大二）</h4>
+              <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">情感认清期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>孙一杨与北大同学李奕交往，李奕温柔体贴、学业优秀，但孙一杨发现两人“精神共鸣缺失”（无共同校园回忆、兴趣差异大）</li>
+              <li>对比细节：李奕记不住孙一杨的饮食禁忌，而邓开文能精准说出“不吃香菜、爱喝珍珠奶茶”；李奕不懂孙一杨对“二中天台”的执念</li>
+              <li>邓开文偶尔分享科研进展，孙一杨不自觉将其与李奕对比，发现“邓开文的执着、默契是别人无法替代的”</li>
+              <li>孙一杨开始频繁翻看与邓开文的旧照片、聊天记录，内心动摇，意识到“新欢无法填补旧爱空白”</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2024年：分手与反思 -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-purple-500 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-purple-500">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-purple-500">2024年 分手与反思（孙一杨大二，邓开文大三）</h4>
+              <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">反思沉淀期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>2024.4 李奕发现孙一杨仍与邓开文联系，提出分手，孙一杨坦然接受</li>
+              <li>孙一杨开始深度反思情感需求，意识到“无法像爱邓开文一样爱别人”，写下《关于复合事件的思考》</li>
+              <li>邓开文向孙一杨坦诚“分手期间未真正喜欢别人，在其他女生身上看到孙一杨的影子”</li>
+              <li>两人频繁沟通，邓开文承认“过去不懂珍惜”，孙一杨确认邓开文仍具备她喜欢的核心特质</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2024年 坦诚沟通（孙一杨大二，邓开文大三） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-orange-400 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-orange-400">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-orange-400">2024年 坦诚沟通（孙一杨大二，邓开文大三）</h4>
+              <span class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded">复合铺垫期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>孙一杨与李奕分手后，主动约邓开文视频通话，坦诚“无法忘记他”，邓开文回应“我也是”</li>
+              <li>深度沟通核心矛盾：孙一杨提及“罗美桃事件”“消息敷衍”的伤害，邓开文道歉并反思“过去不懂边界、忽视你的感受”</li>
+              <li>约定“试复合”规则：每天固定时间沟通、重要决策提前商量、异性边界明确、共同规划未来（减少异地）</li>
+              <li>邓开文主动分享手机密码、社交账号，孙一杨也向其开放朋友圈权限，重建信任基础</li>
+            </ul>
+          </div>
+        </div>
+        <!-- 2025年 复合与未来规划（孙一杨大三，邓开文大四） -->
+        <div class="relative pl-10 pb-12">
+          <div class="timeline-dot bg-red-600 border-white absolute left-0 top-0"></div>
+          <div class="bg-white rounded-lg shadow-md p-5 border-l-4 border-red-600">
+            <div class="flex justify-between items-center mb-2">
+              <h4 class="text-lg font-bold text-red-600">2025年 复合与未来规划（孙一杨大三，邓开文大四）</h4>
+              <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">稳定发展期</span>
+            </div>
+            <ul class="list-disc list-inside text-gray-600 text-sm space-y-1">
+              <li>2025.7 邓开文正式向孙一杨提出复合，孙一杨答应，两人在南宁二中拍照纪念（重回恋爱起点）</li>
+              <li>孙一杨赴上海复旦探望邓开文，两人在光华楼楼顶接吻，明确“奔着一辈子”的核心目标</li>
+              <li>长期规划：邓开文优先申请北大/清华物理类保研（2026年赴京读研，结束异地）；孙一杨修经济法学双学位，备考司法考试，计划北京就业定居</li>
+              <li>家庭认可：2025年国庆邓开文陪同孙一杨见父母，双方家长均认可这段关系；约定“30岁前结婚，南宁、北京各置一房，每年回二中纪念恋爱起点”</li>
+              <li>2025.10 两人共同乘航班，孙一杨在飞机上写下后记，承诺“余生与邓开文共度”，为八年情感历程画上圆满句号</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="bg-gray-800 text-white py-8">
+          <div class="container mx-auto px-4 text-center">
+            <p class="mb-4">《星轨》人物关系与事件时间轴可视化 | 基于原文内容整理</p>
+            <p class="text-sm text-gray-400">© 2025 星轨可视化项目 | 设计与开发：基于Tailwind CSS + D3.js + Chart.js</p>
+          </div>
+        </footer>
+
+        <!-- D3.js 人物关系图逻辑 -->
+        <script>
+          // 人物关系数据
+          const graphData = {
+            nodes: [
+              { id: 1, name: "孙一杨", group: 1, size: 25 }, // 女主
+              { id: 2, name: "邓开文", group: 2, size: 25 }, // 男主
+              { id: 3, name: "彭海宁", group: 3, size: 15 }, // 邓开文前任
+              { id: 4, name: "罗美桃", group: 3, size: 15 }, // 邓开文暧昧对象
+              { id: 5, name: "李奕", group: 4, size: 15 },   // 孙一杨前任
+              { id: 6, name: "林楚珊", group: 5, size: 18 }, // 孙一杨闺蜜
+              { id: 7, name: "邓健桓", group: 5, size: 18 }, // 邓开文好友
+              { id: 8, name: "郭雄", group: 6, size: 15 },   // 邓开文班主任
+              { id: 9, name: "赵钰宁", group: 6, size: 15 }, // 邓开文班主任
+              { id: 10, name: "nzw", group: 3, size: 12 },  // 邓开文提及对象
+              { id: 11, name: "黄祖熠", group: 5, size: 12 },// 邓开文好友
+              { id: 12, name: "潘笑航", group: 5, size: 12 },// 邓开文好友
+            ],
+            links: [
+              // 核心情侣
+              { source: 1, target: 2, value: 10, label: "恋人（暗恋→相恋→分手→复合）" },
+              // 邓开文与前任/暧昧对象
+              { source: 2, target: 3, value: 5, label: "初中女友（2017-2018）" },
+              { source: 2, target: 4, value: 6, label: "高中同学（过度亲密）" },
+              { source: 2, target: 10, value: 3, label: "提及好感（2019）" },
+              // 孙一杨与前任
+              { source: 1, target: 5, value: 4, label: "大学男友（2023-2024）" },
+              // 支持型好友
+              { source: 1, target: 6, value: 8, label: "闺蜜（见证全程）" },
+              { source: 2, target: 7, value: 8, label: "好友（客观分析）" },
+              { source: 2, target: 11, value: 3, label: "高中好友" },
+              { source: 2, target: 12, value: 3, label: "高中好友" },
+              // 老师/外部影响者
+              { source: 2, target: 8, value: 4, label: "班主任（反对恋爱）" },
+              { source: 2, target: 9, value: 4, label: "班主任（干预→认可）" },
+              // 跨组关联
+              { source: 1, target: 7, value: 5, label: "信任的第三方" },
+              { source: 2, target: 6, value: 5, label: "共同好友" },
+            ]
+          };
+
+          // 颜色配置
+          const colorScale = d3.scaleOrdinal()
+            .domain([1, 2, 3, 4, 5, 6])
+            .range(["#EC4899", "#3B82F6", "#EAB308", "#F97316", "#22C55E", "#8B5CF6"]);
+
+          // 创建SVG容器
+          const svg = d3.select("#network-graph")
+            .append("svg")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .attr("viewBox", [0, 0, 1000, 600]);
+
+          // 创建力导向图
+          const simulation = d3.forceSimulation(graphData.nodes)
+            .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(d => 150 - d.value * 5))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .force("center", d3.forceCenter(500, 300))
+            .force("collide", d3.forceCollide().radius(d => d.size + 20));
+
+          // 绘制连接线
+          const link = svg.append("g")
+            .selectAll("line")
+            .data(graphData.links)
+            .enter()
+            .append("line")
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+            .attr("stroke-width", d => Math.sqrt(d.value));
+
+          // 绘制连接标签
+          const linkLabel = svg.append("g")
+            .selectAll("text")
+            .data(graphData.links)
+            .enter()
+            .append("text")
+            .attr("class", "edge-label")
+            .text(d => d.label)
+            .attr("dy", -5);
+
+          // 绘制节点
+          const node = svg.append("g")
+            .selectAll("circle")
+            .data(graphData.nodes)
+            .enter()
+            .append("circle")
+            .attr("r", d => d.size)
+            .attr("fill", d => colorScale(d.group))
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 2)
+            .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
+
+          // 绘制节点标签
+          const nodeLabel = svg.append("g")
+            .selectAll("text")
+            .data(graphData.nodes)
+            .enter()
+            .append("text")
+            .text(d => d.name)
+            .attr("font-size", 12)
+            .attr("dx", d => d.size + 5)
+            .attr("dy", 4);
+
+          // 更新力导向图
+          simulation.on("tick", () => {
+            link
+              .attr("x1", d => d.source.x)
+              .attr("y1", d => d.source.y)
+              .attr("x2", d => d.target.x)
+              .attr("y2", d => d.target.y);
+
+            linkLabel
+              .attr("x", d => (d.source.x + d.target.x) / 2)
+              .attr("y", d => (d.source.y + d.target.y) / 2);
+
+            node
+              .attr("cx", d => d.x = Math.max(d.size, Math.min(1000 - d.size, d.x)))
+              .attr("cy", d => d.y = Math.max(d.size, Math.min(600 - d.size, d.y)));
+
+            nodeLabel
+              .attr("x", d => d.x)
+              .attr("y", d => d.y);
+          });
+
+          // 拖拽函数
+          function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+          }
+
+          function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+          }
+
+          function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+          }
+        </script>
+</body>
+
+</html>
